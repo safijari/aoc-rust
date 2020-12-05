@@ -1,21 +1,23 @@
 #[macro_use]
 extern crate fstrings;
+
+// #
+
 use std::fs;
 
-fn extract_sum(numbers: &Vec<i32>, sum: i32) -> Option<(i32, i32)> {
-    for i in 0..numbers.len() {
-	for j in 0..numbers.len() {
-	    if i == j {
-		continue
-	    }
-	    if numbers[i] + numbers[j] == sum {
-		return Some((numbers[i], numbers[j]))
-	    }
-	}
-    }
-    None
+fn extract_sum(numbers: &Vec<i32>, sum: i32) -> Option<(i32, i32, i32)> {
+    let mut out = None;
+    numbers.iter().enumerate().for_each(|(i1, x1)| {
+        numbers.iter().enumerate().for_each(|(i2, x2)| {
+            numbers.iter().enumerate().for_each(|(i3, x3)| {
+                if !(i1 == i2 && i2 == i3) && (x1 + x2 + x3 == sum) {
+                    out = Some((*x1, *x2, *x3))
+                }
+            })
+        })
+    });
+    out
 }
-
 
 fn main() {
     let extract_2020 = |numbers| extract_sum(numbers, 2020);
@@ -24,8 +26,8 @@ fn main() {
         .split("\n")
         .map(|x| x.parse().expect(&f!("Could not parse {x} into an int")))
         .collect();
-    if let Some((n1, n2)) = extract_2020(&numbers) {
-	println!("{}", n1 * n2)
+    if let Some((n1, n2, n3)) = extract_2020(&numbers) {
+        println!("{}", n1 * n2 * n3)
     }
-
+    // extract_sum_gen(&numbers, 3, 2020);
 }
