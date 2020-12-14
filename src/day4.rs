@@ -2,69 +2,29 @@ use regex::Regex;
 use std::collections::{HashMap, HashSet};
 use std::fs;
 
-#[cfg(test)]
-#[test]
-fn test_validate_year() {
-    let by = |y| validate_year(y, 1920, 2002);
-    assert!(by("1920"));
-    assert!(by("2002"));
-    assert!(!by("b002"));
-    assert!(!by("202"));
-    assert!(!by("1919"));
-    assert!(!by("2003"));
-    assert!(by("1950"));
-}
-
-#[test]
-fn test_validate_height() {
-    let f = validate_height;
-    assert!(f("150cm"));
-    assert!(f("180cm"));
-    assert!(f("193cm"));
-    assert!(f("59in"));
-    assert!(f("70in"));
-    assert!(f("76in"));
-
-    assert!(!f("50cm"));
-    assert!(!f("180m"));
-    assert!(!f("193cmcm"));
-    assert!(!f("599in"));
-    assert!(!f("70iin"));
-    assert!(!f("7in"));
-}
-
-fn validate_height(ht: &str) -> bool {
-    let r = Regex::new(r"^(([6][0-9]|59|7[0-6])in)|((1[5-8][0-9]|19[0-3])cm)$")
-        .expect("can't make regex");
-    return r.is_match(ht);
-}
-
-fn validate_year(yr: &str, min_yr: i32, max_yr: i32) -> bool {
-    if yr.len() != 4 {
-        return false;
-    }
-
-    let yr: i32 = match yr.parse() {
-        Ok(data) => data,
-        Err(err) => return false,
-    };
-
-    if !(yr >= min_yr && yr <= max_yr) {
-        return false;
-    }
-
-    return true;
+fn make_validators<'a>() -> HashMap<&'a str, Regex> {
+    return vec![
+        ("hgt", "(([6][0-9]|59|7[0-6])in)|((1[5-8][0-9]|19[0-3])cm)"),
+        ("byr", "([1-2][9][0|2-9][0-9])|(200[0-3])"),
+        ("iyr", "(201[0-9]|2020)"),
+        ("eyr", "(202[0-9]|2030)"),
+        ("hcl", "(#[0-9|a-f]{6})"),
+        ("ecl", "(amb|blu|brn|gry|grn|hzl|oth)"),
+        ("pid", "([0-9]{9})"),
+    ]
+    .into_iter()
+    .map(|(k, v)| {
+        (
+            k,
+            Regex::new(&format!("^{}$", v)).expect("can't initialize regex"),
+        )
+    })
+    .collect();
 }
 
 fn main() {
-    let validators: HashMap<&str, _> =
-        vec![("hgt", "(([6][0-9]|59|7[0-6])in)|((1[5-8][0-9]|19[0-3])cm)"),
-	]
-            .into_iter()
-            .map(|(k, v)| (k, Regex::new(v).expect("can't initialize regex")))
-            .collect();
 
-    println!("{:?}", validators);
+    let validators = make_validators();
 
     let data = fs::read_to_string("/home/jari/aoc/src/day4_input").expect("can't read file");
     let mut expected_fields: HashSet<&str> = vec!["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
@@ -80,6 +40,7 @@ fn main() {
     let mut dict_list = Vec::new();
 
     let mut num_valid = 0;
+    let mut num_valid_strict = 0;
 
     for line in data.iter() {
         let mut dict = HashMap::new();
@@ -98,12 +59,19 @@ fn main() {
         // println!("{:?}, {:?}", fields, expected_fields);
         if fields.symmetric_difference(&expected_fields).count() == 0 {
             num_valid += 1;
+            let mut valid_strict = true;
+            for f_ in expected_fields.iter() {
+                if !validators[f_].is_match(dict[f_]) {
+                    valid_strict = false;
+                }
+            }
+            if valid_strict {
+                num_valid_strict += 1;
+            }
         }
 
         dict_list.push(dict);
     }
 
-    // let data = data.iter().map(|s| s.split(" "));
-
-    println!("{}, {}", num_valid, data.len());
+    println!("{}, {} / {}", num_valid, num_valid_strict, data.len());
 }
