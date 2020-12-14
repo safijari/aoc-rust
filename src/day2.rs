@@ -1,5 +1,3 @@
-#[macro_use]
-extern crate fstrings;
 use anyhow::Result;
 use std::collections::HashMap;
 use std::fs;
@@ -39,8 +37,9 @@ impl PasswordInfo {
     }
 
     fn check_cond2(&self) -> bool {
-	let chars = self.password.chars().collect::<Vec<_>>();
-	return (chars[(self.min - 1) as usize] == self.letter) ^ (chars[(self.max - 1) as usize] == self.letter)
+        let chars = self.password.chars().collect::<Vec<_>>();
+        return (chars[(self.min - 1) as usize] == self.letter)
+            ^ (chars[(self.max - 1) as usize] == self.letter);
     }
 }
 
@@ -57,7 +56,7 @@ mod tests {
 
         assert_eq!(val.count_letter(), 6);
 
-	assert!(!val.check_cond2())
+        assert!(!val.check_cond2())
     }
 }
 

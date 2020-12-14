@@ -1,8 +1,3 @@
-#[macro_use]
-extern crate fstrings;
-
-// #
-
 use std::fs;
 
 fn extract_sum(numbers: &Vec<i32>, sum: i32) -> Option<(i32, i32, i32)> {
@@ -24,7 +19,10 @@ fn main() {
     let data = fs::read_to_string("/home/jari/aoc/src/day1_input").expect("can't read file");
     let numbers: Vec<i32> = data
         .split("\n")
-        .map(|x| x.parse().expect(&f!("Could not parse {x} into an int")))
+        .map(|x| {
+            x.parse()
+                .expect(&format!("Could not parse {} into an int", x))
+        })
         .collect();
     if let Some((n1, n2, n3)) = extract_2020(&numbers) {
         println!("{}", n1 * n2 * n3)
