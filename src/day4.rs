@@ -23,7 +23,6 @@ fn make_validators<'a>() -> HashMap<&'a str, Regex> {
 }
 
 fn main() {
-
     let validators = make_validators();
 
     let data = fs::read_to_string("/home/jari/aoc/src/day4_input").expect("can't read file");
