@@ -47,7 +47,7 @@ fn part2(input: &str) -> i32 {
             for set in sets.iter() {
                 first_set = first_set.intersection(set).copied().collect();
             }
-	    first_set.len() as i32
+            first_set.len() as i32
         })
         .sum();
 }
