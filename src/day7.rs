@@ -123,9 +123,9 @@ fn part2(bags: &HashMap<String, Bag>) -> i32 {
     let mut ct = 0;
     let mut children = Vec::new();
     for c in node.children.iter() {
-	for _ in 0..c.1 {
-	    children.push(c.clone());
-	}
+        for _ in 0..c.1 {
+            children.push(c.clone());
+        }
     }
 
     while children.len() > 0 {
@@ -134,12 +134,12 @@ fn part2(bags: &HashMap<String, Bag>) -> i32 {
             None => continue,
         };
 
-	ct += 1;
+        ct += 1;
 
         for c in cur.children.iter() {
-	    for _ in 0..c.1 {
-		children.push(c.clone());
-	    }
+            for _ in 0..c.1 {
+                children.push(c.clone());
+            }
         }
     }
 
